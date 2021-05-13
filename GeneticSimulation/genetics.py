@@ -33,7 +33,7 @@ def start_life(generations: int, population: int):
 
         start_time = datetime.now()
 
-        with open(f"generation{i}", 'w') as f:
+        with open(f"./{POPULATION_STORAGE}/generation{i}", 'w') as f:
             f.write(f"# Generation {i} is born\n")
 
         with pool.Pool(min(generations, MAX_THREADS)) as p:
