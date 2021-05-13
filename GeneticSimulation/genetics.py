@@ -2,7 +2,8 @@ import os
 
 from numpy import isnan
 from multiprocessing import pool
-from . import Optimizer, FitnessScore, MAX_THREADS, POPULATION_STORAGE, POPULATION_STORAGE
+from optimizer import Optimizer, FitnessScore
+from options import MAX_THREADS, POPULATION_STORAGE
 from json import dumps
 from datetime import datetime
 

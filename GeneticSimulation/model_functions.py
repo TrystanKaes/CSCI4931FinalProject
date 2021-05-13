@@ -1,4 +1,3 @@
-from GeneticSimulation.options import DATASET_FILEPATH
 from tensorflow import keras
 from tensorflow.keras.layers import Dense, Activation, Dropout
 
@@ -7,7 +6,8 @@ from sklearn.metrics import classification_report
 import random
 import numpy as np
 
-from . import prepareDataset, ACTIVATIONS, LOSSES, OPTIMIZERS, BATCH_SIZES, MAX_LAYERS, MAX_NODES, DEFAULT_EPOCH, DATASET_FILEPATH, LAYER_TYPES
+from options import DATASET_FILEPATH, ACTIVATIONS, LOSSES, OPTIMIZERS, BATCH_SIZES, MAX_LAYERS, MAX_NODES, DEFAULT_EPOCH, DATASET_FILEPATH, LAYER_TYPES
+from housekeeping import prepareDataset
 
 x_train, x_test, y_train, y_test = prepareDataset(DATASET_FILEPATH)
 

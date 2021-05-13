@@ -1,7 +1,7 @@
 import random
 from numpy.random import permutation
 
-from . import createRandIndividual, fitness_score
+from model_functions import createRandIndividual, fitness_score
 
 
 def FitnessScore(individual):
