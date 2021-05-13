@@ -1,84 +1,125 @@
+from GeneticSimulation.options import DATASET_FILEPATH
 from tensorflow import keras
 from tensorflow.keras.layers import Dense, Activation, Dropout
 
-from sklearn.metrics import precision_score, f1_score, recall_score
+from sklearn.metrics import classification_report
 
 import random
+import numpy as np
+
+from . import prepareDataset, ACTIVATIONS, LOSSES, OPTIMIZERS, BATCH_SIZES, MAX_LAYERS, MAX_NODES, DEFAULT_EPOCH, DATASET_FILEPATH, LAYER_TYPES
+
+x_train, x_test, y_train, y_test = prepareDataset(DATASET_FILEPATH)
 
 
-from options import ACTIVATIONS, LOSSES, OPTIMIZERS, BATCH_SIZES, MAX_LAYERS, MAX_NODES, DEFAULT_EPOCH
+def RandomElement(l):
+    return l[random.randint(0, len(l) - 1)]
 
-from housekeeping import prepareDataset 
-
-x_train, x_test, y_train, y_test = prepareDataset("./dataset.csv")
 
 def createRandIndividual():
+    bias = [True, False]
     layers = []
-    for i in range(random.randint(0, MAX_LAYERS)):
-        layer = {
-            "count": random.randint(0, MAX_NODES),
-            "activation": ACTIVATIONS[random.randint(0, len(ACTIVATIONS)-1)],
-            "dropout": random.random(),
-        }
+    for _ in range(random.randint(0, MAX_LAYERS)):
+        name = RandomElement(LAYER_TYPES)
+        layer = {}
+        if name == "Dense":
+            layer = {
+                "name": name,
+                "options": {
+                    "units": random.randint(0, MAX_NODES),
+                    "activation": RandomElement(ACTIVATIONS),
+                    "dropout": random.random(),
+                    "use_bias": RandomElement(bias)
+                },
+            }
+        elif name == "BatchNormalization" or name == "LayerNormalization":
+            layer = {
+                "name": name,
+                "options": {},
+            }
+        elif name == "Dropout":
+            layer = {
+                "rate": random.random(),
+            }
         layers.append(layer)
+
+    # Final prediction layer
+    layers.append({
+        "name": "Dense",
+        "options": {
+            "units": 4,
+            "activation": 'softmax',
+        },
+    })
+
+    layers[0]['input_shape'] = (x_train.shape[1], )
 
     return {
         "layers": layers,
-        "loss_function": LOSSES[random.randint(0, len(LOSSES)-1)],
-        "optimizer": OPTIMIZERS[random.randint(0, len(OPTIMIZERS)-1)],
-        "batch_size": BATCH_SIZES[random.randint(0, len(BATCH_SIZES)-1)],
+        "loss_function": LOSSES[random.randint(0,
+                                               len(LOSSES) - 1)],
+        "optimizer": OPTIMIZERS[random.randint(0,
+                                               len(OPTIMIZERS) - 1)],
+        "batch_size": BATCH_SIZES[random.randint(0,
+                                                 len(BATCH_SIZES) - 1)],
+        "learning_rate": random.uniform(0.1, 0.001),
     }
 
-def make_that_model(layers, loss_function, optimizer, exit_activation=None):
+
+#--------------------------------------------------------------------------
+def make_that_model(layers,
+                    loss_function,
+                    optimizer,
+                    learning_rate,
+                    exit_activation=None):
     model = keras.Sequential()
-    for i, layer in enumerate(layers):
-        if i==0:
-            model.add(Dense(layer["count"], input_dim=x_train.shape[1]))
-            model.add(Activation(layer["activation"]))
-            model.add(Dropout(layer["dropout"]))
-        else:
-            model.add(Dense(layer["count"]))
-            model.add(Activation(layer["activation"]))
-            model.add(Dropout(layer["dropout"]))
+    for layer in layers:
+        model.add(getattr(keras.layers, layer["name"])(**layer["options"]))
 
-    model.add(Dense(1))
-
-    if exit_activation!=None:
+    if exit_activation != None:
         model.add(Activation(exit_activation))
 
-    model.compile(loss=loss_function, optimizer=optimizer, metrics=['accuracy'])
+    op = getattr(keras.optimizers, optimizer)(learning_rate=(learning_rate))
+    model.compile(loss=loss_function, optimizer=op, metrics=['accuracy'])
 
     return model
 
 
+#--------------------------------------------------------------------------
+
+
 def fitness_score(parameterization, epoch=DEFAULT_EPOCH):
-    
-    model = make_that_model(parameterization.get('layers'),
-                            parameterization.get('loss_function'),
-                            parameterization.get('optimizer'),
-                             )
-    
+
+    model = make_that_model(
+        parameterization.get('layers'),
+        parameterization.get('loss_function'),
+        parameterization.get('optimizer'),
+        parameterization.get('learning_rate'),
+    )
+
     batch_size = parameterization.get('batch_size')
-    
-    _ = model.fit(x_train, y_train, batch_size=batch_size,  epochs=epoch, verbose=0)
+
+    _ = model.fit(x_train,
+                  y_train,
+                  batch_size=batch_size,
+                  epochs=epoch,
+                  verbose=0)
 
     # Predict with it
-    pred_y = model.predict(x_test)
+    pred = model.predict(x_test)
 
-    y_pred = [(0.5 < n) for n in pred_y]
-    y_actual = [(0.5 < n) for n in y_test]
+    got = np.argmax(pred, -1)
+    want = np.argmax(y_test, -1)
 
-    precision = precision_score(y_actual, y_pred, average='binary', zero_division=0)
-    f1 = f1_score(y_actual, y_pred, average='binary', zero_division=0)
-    recall = recall_score(y_actual, y_pred, average='binary', zero_division=0)
+    average = 'weighted avg'
 
-        # Collect Metrics
-    metrics = dict(zip(model.metrics_names, model.evaluate(
-        x=x_test,
-        y=y_test,
-        batch_size=batch_size
-    )))
+    stat = classification_report(want, got, output_dict=True)
+    metrics = dict(
+        zip(model.metrics_names,
+            model.evaluate(x=x_test, y=y_test, batch_size=batch_size)))
 
-    score = (metrics['accuracy']+precision+f1+(1-metrics['loss'])+recall) / 5
+    score = (stat['accuracy'] + stat[average]['precision'] +
+             stat[average]['f1-score'] +
+             (1 - metrics['loss']) + stat[average]['recall']) / 5
 
     return score * 100

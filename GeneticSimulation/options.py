@@ -1,16 +1,21 @@
+DATASET_FILEPATH = "./SLE_RA_Control_blood_panels.csv"
+POPULATION_STORAGE = "Population"
+
 MAX_THREADS = 10000
 MAX_LAYERS = 25
 MAX_NODES = 200
 DEFAULT_EPOCH = 100
 
 ACTIVATIONS = [
-    'relu',
-    'softmax',
-    'sigmoid',
-    # 'leakyrelu',
-    # 'prelu',
-    'elu',
-    # 'thresholdedrelu'
+    'relu', 'softmax', 'sigmoid', 'leakyrelu', 'prelu', 'elu',
+    'thresholdedrelu'
+]
+
+LAYER_TYPES = [
+    'Dense',
+    'Dropout',
+    'BatchNormalization',
+    'LayerNormalization',
 ]
 
 LOSSES = [
@@ -28,16 +33,14 @@ LOSSES = [
 ]
 
 OPTIMIZERS = [
-    'sgd',
-    'rmsprop',
-    'adam',
-    'adadelta',
-    'adagrad',
-    'adamax',
-    'nadam',
-    'ftrl',
+    'SGD',
+    'RMSprop',
+    'Adam',
+    'Adadelta',
+    'Adagrad',
+    'Adamax',
+    'Nadam',
+    'Ftrl',
 ]
 
 BATCH_SIZES = [16, 32, 64, 128, 256, 512]
-
-POPULATION_STORAGE = "/Population/"

@@ -2,8 +2,7 @@ import os
 
 from numpy import isnan
 from multiprocessing import pool
-from options import MAX_THREADS, POPULATION_STORAGE, POPULATION_STORAGE
-from optimizer import Optimizer, FitnessScore
+from . import Optimizer, FitnessScore, MAX_THREADS, POPULATION_STORAGE, POPULATION_STORAGE
 from json import dumps
 from datetime import datetime
 
@@ -48,7 +47,7 @@ def start_life(generations: int, population: int):
 
         averageScore = life.getAvgScore(population)
 
-        with open(f"generation{i}", 'a') as f:
+        with open(f"./{POPULATION_STORAGE}/generation{i}", 'a') as f:
             f.write(f"# Time to live: {end_time}\n")
             f.write(f"# Average Health Score {averageScore}\n")
             f.write(
