@@ -1,3 +1,8 @@
+"""
+    This creates a dataset of blood panels that has 20 controls, 20 RA, and 20 SLE patient panels. 
+    It uses multiprocessing to speed up the process but it is very CPU intensive.
+    A performant computer is definitely recommended.
+"""
 import random
 import numpy as np
 import pandas as pd
@@ -85,7 +90,5 @@ if __name__ == '__main__':
 
     for sample in res:
         blood_samples = blood_samples.append(sample, ignore_index=True)
-
-    blood_samples.head()
 
     blood_samples.to_csv('./SLE_RA_Control_blood_panels.csv')
