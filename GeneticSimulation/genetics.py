@@ -3,7 +3,7 @@ import os
 from numpy import isnan
 from multiprocessing import pool, cpu_count
 from optimizer import Optimizer, FitnessScore
-from options import MAX_THREADS, POPULATION_STORAGE
+from options import MAX_PROCESSES, POPULATION_STORAGE
 from json import dumps
 from datetime import datetime
 
@@ -36,7 +36,7 @@ def start_life(generations: int, population: int):
         with open(f"./{POPULATION_STORAGE}/generation{i}", 'w') as f:
             f.write(f"# Generation {i} is born\n")
 
-        with pool.Pool(cpu_count()) as p:
+        with pool.Pool(min(cpu_count(), MAX_PROCESSES)) as p:
             population = p.map(FitnessScore, population)
 
         # Did anyone die during their life?
