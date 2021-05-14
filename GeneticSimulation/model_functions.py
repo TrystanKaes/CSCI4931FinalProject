@@ -49,7 +49,7 @@ def createRandIndividual():
         },
     })
 
-    layers[0]['input_shape'] = (x_train.shape[1], )
+    layers[0]['options']['input_shape'] = (x_train.shape[1], )
 
     return {
         "layers": layers,
