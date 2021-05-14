@@ -68,8 +68,8 @@ def ReadDataset():
         else:
             print(disease)
 
-    RA = random.sample(RA, 30)
-    SLE = random.sample(SLE, 30)
+    RA = random.sample(RA, 20)
+    SLE = random.sample(SLE, 20)
 
     samples = []
     for i, sample_id in enumerate([*RA, *SLE, *Control]):
