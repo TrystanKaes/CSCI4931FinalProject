@@ -11,19 +11,6 @@ def prepareDataset(filepath):
     data = pd.read_csv(filepath)
     data = data.drop(data.columns[0], axis=1)
 
-    # Create correlation matrix
-    corr_matrix = data.corr().abs()
-
-    # Select upper triangle of correlation matrix
-    upper = corr_matrix.where(
-        np.triu(np.ones(corr_matrix.shape), k=1).astype(np.bool))
-
-    # Find features with correlation greater than 0.95
-    to_drop = [column for column in upper.columns if any(upper[column] > 0.95)]
-
-    # Drop features
-    data.drop(to_drop, axis=1, inplace=True)
-
     global LABELER
     LABELER = LabelEncoder()
 

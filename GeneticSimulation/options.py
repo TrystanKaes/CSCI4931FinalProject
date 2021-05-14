@@ -1,4 +1,4 @@
-DATASET_FILEPATH = "./SLE_RA_Control_blood_panels.csv"
+DATASET_FILEPATH = "./CORE_SLE_RA_Control_blood_panels.csv"
 POPULATION_STORAGE = "Population"
 
 MAX_THREADS = 10000

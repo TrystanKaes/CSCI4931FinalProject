@@ -1,3 +1,4 @@
+from numpy.core.numeric import Inf
 from tensorflow import keras
 from tensorflow.keras.layers import Dense, Activation, Dropout
 
@@ -32,15 +33,12 @@ def createRandIndividual():
                     "use_bias": RandomElement(bias)
                 },
             }
-        elif name == "BatchNormalization" or name == "LayerNormalization":
+        elif name == "BatchNormalization":
             layer = {
                 "name": name,
                 "options": {},
             }
-        elif name == "Dropout":
-            layer = {
-                "rate": random.random(),
-            }
+
         layers.append(layer)
 
     # Final prediction layer
@@ -98,12 +96,14 @@ def fitness_score(parameterization, epoch=DEFAULT_EPOCH):
     )
 
     batch_size = parameterization.get('batch_size')
-
-    _ = model.fit(x_train,
-                  y_train,
-                  batch_size=batch_size,
-                  epochs=epoch,
-                  verbose=0)
+    try:
+        _ = model.fit(x_train,
+                      y_train,
+                      batch_size=batch_size,
+                      epochs=epoch,
+                      verbose=0)
+    except ValueError:
+        return -Inf
 
     # Predict with it
     pred = model.predict(x_test)
