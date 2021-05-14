@@ -74,10 +74,6 @@ def make_that_model(layers,
                     exit_activation=None):
     model = keras.Sequential()
     for layer in layers:
-        #print(layer)
-        if 'dropout' in layer['options'].keys():
-            del layer['options']['dropout']
-            #layer['options']['Dropout'] = layer['options'].pop('dropout')
         model.add(getattr(keras.layers, layer["name"])(**layer["options"]))
 
     if exit_activation != None:
