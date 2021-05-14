@@ -29,7 +29,6 @@ def createRandIndividual():
                 "options": {
                     "units": random.randint(0, MAX_NODES),
                     "activation": RandomElement(ACTIVATIONS),
-                    "dropout": random.random(),
                     "use_bias": RandomElement(bias)
                 },
             }
@@ -113,7 +112,7 @@ def fitness_score(parameterization, epoch=DEFAULT_EPOCH):
 
     average = 'weighted avg'
 
-    stat = classification_report(want, got, output_dict=True)
+    stat = classification_report(want, got, output_dict=True, zero_division=0)
     metrics = dict(
         zip(model.metrics_names,
             model.evaluate(x=x_test, y=y_test, batch_size=batch_size)))
