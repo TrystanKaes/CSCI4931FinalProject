@@ -7,15 +7,20 @@ MAX_NODES = 200
 DEFAULT_EPOCH = 100
 
 ACTIVATIONS = [
-    'relu', 'softmax', 'sigmoid', 'leakyrelu', 'prelu', 'elu',
-    'thresholdedrelu'
+    'relu',
+    'softmax',
+    'sigmoid',
+    # 'leakyrelu',
+    # 'prelu',
+    'elu',
+    # 'thresholdedrelu'
 ]
 
 LAYER_TYPES = [
     'Dense',
-    'Dropout',
+    # 'Dropout',
     'BatchNormalization',
-    'LayerNormalization',
+    # 'LayerNormalization',
 ]
 
 LOSSES = [
